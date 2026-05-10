@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git remote *)",
+      "Bash(git add *)",
+      "Bash(mvn compile *)",
+      "Bash(mvn package *)",
+      "Bash(npx vue-tsc *)",
+      "Bash(ls -la .gitignore)",
+      "Bash(ls -la .git)",
+      "Bash(git init *)"
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuitong.system.mapper.StudentMapper">
+
+    <resultMap type="Student" id="StudentResult">
+        <id     property="studentNo"     column="student_no"    />
+        <result property="userId"        column="user_id"       />
+        <result property="studentName"   column="student_name"  />
+        <result property="idCard"        column="id_card"       />
+        <result property="age"           column="age"           />
+        <result property="gender"        column="gender"        />
+        <result property="grade"         column="grade"         />
+        <result property="className"     column="class_name"    />
+        <result property="phone"         column="phone"         />
+        <result property="email"         column="email"         />
+        <result property="address"       column="address"       />
+        <result property="enrollmentDate" column="enrollment_date" />
+        <result property="status"        column="status"        />
+        <result property="createTime"    column="create_time"   />
+        <result property="updateTime"    column="update_time"   />
+    </resultMap>
+
+    <sql id="selectStudentVo">
+        select student_no, user_id, student_name, id_card, age, gender, grade, class_name, phone, email, address, enrollment_date, status, create_time, update_time from sys_student
+    </sql>
+
+    <select id="selectStudentList" parameterType="Student" resultMap="StudentResult">
+        <include refid="selectStudentVo"/>
+        <where>
+            <if test="studentNo != null and studentNo != ''">AND student_no like concat('%', #{studentNo}, '%')</if>
+            <if test="studentName != null and studentName != ''">AND student_name like concat('%', #{studentName}, '%')</if>
+            <if test="grade != null and grade != ''">AND grade = #{grade}</if>
+            <if test="className != null and className != ''">AND class_name like concat('%', #{className}, '%')</if>
+            <if test="gender != null and gender != ''">AND gender = #{gender}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectStudentByNo" parameterType="String" resultMap="StudentResult">
+        <include refid="selectStudentVo"/>
+        where student_no = #{studentNo}
+    </select>
+
+    <select id="selectStudentByUserId" parameterType="Long" resultMap="StudentResult">
+        <include refid="selectStudentVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <insert id="insertStudent" parameterType="Student">
+        insert into sys_student (
+            student_no, user_id, student_name, id_card, age, gender, grade,
+            class_name, phone, email, address, enrollment_date, status,
+            create_time, update_time
+        ) values (
+            #{studentNo}, #{userId}, #{studentName}, #{idCard}, #{age}, #{gender}, #{grade},
+            #{className}, #{phone}, #{email}, #{address}, #{enrollmentDate}, #{status},
+            #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <update id="updateStudent" parameterType="Student">
+        update sys_student set
+            user_id = #{userId},
+            student_name = #{studentName},
+            id_card = #{idCard},
+            age = #{age},
+            gender = #{gender},
+            grade = #{grade},
+            class_name = #{className},
+            phone = #{phone},
+            email = #{email},
+            address = #{address},
+            enrollment_date = #{enrollmentDate},
+            status = #{status},
+            update_time = #{updateTime}
+        where student_no = #{studentNo}
+    </update>
+
+    <delete id="deleteStudentByNo" parameterType="String">
+        delete from sys_student where student_no = #{studentNo}
+    </delete>
+
+    <delete id="deleteStudentByNos" parameterType="String">
+        delete from sys_student where student_no in
+        <foreach item="studentNo" collection="array" open="(" separator="," close=")">
+            #{studentNo}
+        </foreach>
+    </delete>
+
+    <select id="checkStudentNoUnique" parameterType="String" resultType="int">
+        select count(*) from sys_student where student_no = #{studentNo}
+    </select>
+
+    <select id="checkUserIdUnique" parameterType="Long" resultType="int">
+        select count(*) from sys_student where user_id = #{userId}
+    </select>
+
+    <select id="selectStudentCount" resultType="int">
+        select count(*) from sys_student
+    </select>
+
+    <select id="selectCourseNamesByStudentNo" parameterType="String" resultType="String">
+        select distinct name from stu_course where student_id = CAST(#{studentNo} AS SIGNED)
+    </select>
+
+</mapper>

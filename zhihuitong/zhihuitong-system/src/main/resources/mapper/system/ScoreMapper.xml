@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuitong.system.mapper.ScoreMapper">
+
+    <resultMap type="Score" id="ScoreResult">
+        <id     property="scoreId"      column="score_id"       />
+        <result property="studentNo"    column="student_no"     />
+        <result property="studentName"  column="student_name"   />
+        <result property="className"    column="class_name"     />
+        <result property="grade"        column="grade"          />
+        <result property="courseName"   column="course_name"    />
+        <result property="scoreValue"   column="score_value"    />
+        <result property="fullScore"    column="full_score"     />
+        <result property="examType"     column="exam_type"      />
+        <result property="examDate"     column="exam_date"      />
+        <result property="remark"       column="remark"         />
+        <result property="createTime"   column="create_time"    />
+        <result property="updateTime"   column="update_time"    />
+    </resultMap>
+
+    <sql id="selectScoreVo">
+        select score_id, student_no, course_name, score_value, full_score, exam_type, exam_date, remark, create_time, update_time from sys_score
+    </sql>
+
+    <select id="selectScoreList" parameterType="Score" resultMap="ScoreResult">
+        <include refid="selectScoreVo"/>
+        <where>
+            <if test="studentNo != null and studentNo != ''">AND student_no = #{studentNo}</if>
+            <if test="courseName != null and courseName != ''">AND course_name like concat('%', #{courseName}, '%')</if>
+            <if test="examType != null and examType != ''">AND exam_type = #{examType}</if>
+            <if test="grade != null and grade != ''">AND grade = #{grade}</if>
+            <if test="className != null and className != ''">AND class_name = #{className}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectScoreById" parameterType="Long" resultMap="ScoreResult">
+        <include refid="selectScoreVo"/>
+        where score_id = #{scoreId}
+    </select>
+
+    <select id="selectScoreByStudentNo" parameterType="String" resultMap="ScoreResult">
+        <include refid="selectScoreVo"/>
+        where student_no = #{studentNo}
+        order by exam_date desc
+    </select>
+
+    <insert id="insertScore" parameterType="Score" useGeneratedKeys="true" keyProperty="scoreId">
+        insert into sys_score (
+            student_no, course_name, score_value, full_score, exam_type,
+            exam_date, remark, create_time, update_time
+        ) values (
+            #{studentNo}, #{courseName}, #{scoreValue}, #{fullScore}, #{examType},
+            #{examDate}, #{remark}, #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <update id="updateScore" parameterType="Score">
+        update sys_score set
+            student_no = #{studentNo},
+            course_name = #{courseName},
+            score_value = #{scoreValue},
+            full_score = #{fullScore},
+            exam_type = #{examType},
+            exam_date = #{examDate},
+            remark = #{remark},
+            update_time = #{updateTime}
+        where score_id = #{scoreId}
+    </update>
+
+    <delete id="deleteScoreById" parameterType="Long">
+        delete from sys_score where score_id = #{scoreId}
+    </delete>
+
+    <delete id="deleteScoreByIds" parameterType="Long">
+        delete from sys_score where score_id in
+        <foreach item="scoreId" collection="array" open="(" separator="," close=")">
+            #{scoreId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteScoreByStudentNo" parameterType="String">
+        delete from sys_score where student_no = #{studentNo}
+    </delete>
+
+</mapper>
